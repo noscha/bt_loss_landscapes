@@ -1,0 +1,12 @@
+[project]
+name = "bt-loss-landscapes"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "matplotlib>=3.10.0",
+    "numpy>=2.2.3",
+    "pytorch-lightning>=2.5.0.post0",
+    "torch>=2.6.0",
+]
