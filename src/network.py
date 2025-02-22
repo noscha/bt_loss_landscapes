@@ -1,16 +1,35 @@
 import torch
 import torch.nn as nn
 import pytorch_lightning as pl
+from torch.utils.data import DataLoader, TensorDataset
 
 class ModelWrapper:
     """
-    Wrapper to access loss of torch model
+    Wrapper to access model and manipulate it
     """
 
-    def __init__(self, model, dataloader):
-        self.model = model
-        self.dataloader = dataloader
-        self.num_params = sum(p.numel() for p in model.parameters())  # Total number of weights
+    def __init__(self, dim=2):
+        self.model = TinyNN(dim)
+        self.dataloader = self.create_data()
+        self.num_params = sum(p.numel() for p in self.model.parameters())  # Total number of weights
+        self.train()
+
+    @staticmethod
+    def create_data():
+        """Create random data"""
+        X = torch.rand(50, 2)
+        y = torch.rand(50, 1)
+
+        dataset = TensorDataset(X, y)
+        dataloader = DataLoader(dataset, batch_size=5, shuffle=True)
+
+        return dataloader
+
+    def train(self):
+        """Train model"""
+        trainer = pl.Trainer(max_epochs=5, accelerator="cpu", enable_progress_bar=False)
+        trainer.fit(self.model, self.dataloader)
+
 
     def get_current_params(self):
         """Returns the current model parameters as a tuple."""
@@ -50,10 +69,10 @@ class TinyNN(pl.LightningModule):
     """
     Small network fot testing of algos
     """
-    def __init__(self):
+    def __init__(self, dim):
         super().__init__()
         self.model = nn.Sequential(
-            nn.Linear(2, 1, bias=False)
+            nn.Linear(dim, 1, bias=False)
             # nn.Linear(1, 2),
             # nn.ReLU(),
             # nn.Linear(2, 1)

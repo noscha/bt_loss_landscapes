@@ -3,28 +3,16 @@ import marching_hypercubes as mh
 
 import numpy as np
 import torch
-import pytorch_lightning as pl
-from torch.utils.data import DataLoader, TensorDataset
 import matplotlib.pyplot as plt
 
 def main():
     torch.manual_seed(42)
-    X = torch.rand(50, 2)
-    y = torch.rand(50, 1)
 
-    dataset = TensorDataset(X, y)
-    dataloader = DataLoader(dataset, batch_size=5, shuffle=True)
-
-    model = nw.TinyNN()
-    trainer = pl.Trainer(max_epochs=5, accelerator="cpu", enable_progress_bar=False)
-    trainer.fit(model, dataloader)
-
-    wrapper = nw.ModelWrapper(model, dataloader)
+    wrapper = nw.ModelWrapper(2)
 
     start_coord = wrapper.get_current_params()
     stepwidth = 0.01
     isovalue = wrapper.evaluate_loss(start_coord)
-    print(isovalue)
 
     isosurface = mh.marching_hypercubes(wrapper.func, stepwidth, isovalue, start_coord)
 
@@ -45,7 +33,6 @@ def main():
     x, y, z = zip(*data)
     a, b, c = zip(*plane)
     crosspoints = [(i, j, z_val) for (i, j, z_val) in zip(x, y, z) if np.isclose(z_val, isovalue, atol=0.0001)]
-    print(crosspoints)
     cx, cy, cz = zip(*crosspoints)
 
     fig = plt.figure()

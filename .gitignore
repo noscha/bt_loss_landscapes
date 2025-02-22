@@ -8,3 +8,9 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Ide
+.idea
+
+# Torch
+*/lightning_logs
