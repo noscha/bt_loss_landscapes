@@ -1,9 +1,8 @@
-import torch
+import src.helper as h
 import src.network as nw
 
-def test_network():
 
-    torch.manual_seed(42)
+def test_network():
     dim = 2
     wrapper = nw.ModelWrapper(dim)
     assert wrapper.num_params == dim
@@ -14,8 +13,14 @@ def test_network():
     assert len(start_coord) == dim
     assert isovalue != 0
 
+    direction = wrapper.get_direction((0, 0))
+    assert len(direction) == dim
+
+
 def all_tests():
+    h.set_enviroment()
     test_network()
+
 
 if __name__ == "__main__":
     all_tests()

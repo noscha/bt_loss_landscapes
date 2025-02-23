@@ -1,12 +1,14 @@
-import network as nw
-import marching_hypercubes as mh
-
-import numpy as np
-import torch
 import matplotlib.pyplot as plt
+import numpy as np
+
+import explorer as e
+import helper as h
+import marching_hypercubes as mh
+import network as nw
+
 
 def main():
-    torch.manual_seed(42)
+    h.set_enviroment(42)
 
     wrapper = nw.ModelWrapper(2)
 
@@ -18,6 +20,13 @@ def main():
 
     plt.figure(figsize=(6, 6))
     plt.scatter(isosurface[:, 0], isosurface[:, 1], s=1, c="blue")
+
+    for i in range(len(isosurface)):
+        direction = wrapper.get_direction(isosurface[i])
+        l = 0.8  # TODO: find minima
+        a, b, c, d = np.concatenate([isosurface[i], -l * direction])
+        plt.quiver(a, b, c, d, angles='xy', scale_units='xy', scale=1, color='b')
+
     plt.title("Isosurface for Circle Function")
     plt.xlabel("X")
     plt.ylabel("Y")
@@ -46,6 +55,17 @@ def main():
     ax.set_zlabel('Z Label')
 
     plt.show()
+
+    t = 0
+    for i in [0.1, 0.01, 0.001, 0.0001, 0.000001, 0.000001]:
+        y = e.explore(wrapper, isosurface[t], wrapper.get_direction(isosurface[t]), i)
+
+        plt.plot(list(range(len(y))), y)
+
+        plt.xlabel('X Values')
+        plt.ylabel('Y Values')
+        plt.title('Graph of Y Values')
+        plt.show()
 
 
 if __name__ == "__main__":

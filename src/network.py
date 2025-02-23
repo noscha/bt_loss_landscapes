@@ -1,7 +1,8 @@
+import pytorch_lightning as pl
 import torch
 import torch.nn as nn
-import pytorch_lightning as pl
 from torch.utils.data import DataLoader, TensorDataset
+
 
 class ModelWrapper:
     """
@@ -10,14 +11,15 @@ class ModelWrapper:
 
     def __init__(self, dim=2):
         self.model = TinyNN(dim)
-        self.dataloader = self.create_data()
+        self.input_dim = dim  # TODO: might change later on
+        self.dataloader = self.create_data(self.input_dim)
         self.num_params = sum(p.numel() for p in self.model.parameters())  # Total number of weights
         self.train()
 
     @staticmethod
-    def create_data():
+    def create_data(dim):
         """Create random data"""
-        X = torch.rand(50, 2)
+        X = torch.rand(50, dim)
         y = torch.rand(50, 1)
 
         dataset = TensorDataset(X, y)
@@ -29,7 +31,6 @@ class ModelWrapper:
         """Train model"""
         trainer = pl.Trainer(max_epochs=5, accelerator="cpu", enable_progress_bar=False)
         trainer.fit(self.model, self.dataloader)
-
 
     def get_current_params(self):
         """Returns the current model parameters as a tuple."""
@@ -64,11 +65,34 @@ class ModelWrapper:
         assert len(params) == self.num_params, f"Expected {self.num_params} parameters, got {len(params)}"
         return self.evaluate_loss(params)
 
+    def get_direction(self, new_params):
+        """ Get normalized derivative for given parameters"""
+
+        self.set_model_params(new_params)
+        self.model.zero_grad()  # Ensure gradients are fresh
+
+        total_loss = 0.0
+        for inputs, targets in self.dataloader:
+            outputs = self.model(inputs)
+            loss = self.model.criterion(outputs, targets)
+            total_loss += loss
+
+        total_loss /= len(self.dataloader)
+        total_loss.backward()
+        direction_vector = torch.cat([p.grad.view(-1) for p in self.model.parameters() if p.grad is not None])
+        self.model.zero_grad()  # Reset gradients after extraction
+
+        direction_vector = direction_vector.detach().numpy()
+        # TODO: normalization ???
+        # direction_vector /= np.linalg.norm(direction_vector)
+        return direction_vector
+
 
 class TinyNN(pl.LightningModule):
     """
     Small network fot testing of algos
     """
+
     def __init__(self, dim):
         super().__init__()
         self.model = nn.Sequential(

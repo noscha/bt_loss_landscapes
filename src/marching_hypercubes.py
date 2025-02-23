@@ -1,6 +1,7 @@
-import numpy as np
-from itertools import product, combinations
 from collections import deque
+from itertools import product, combinations
+
+import numpy as np
 
 
 def generate_lookup_table(dim):
@@ -83,7 +84,7 @@ def marching_hypercubes(func, stepwidth, isovalue, start_coord):
         origin = grid_origin + stepwidth * np.array(indices)
         vertices = get_hypercube_vertices(dim, origin, stepwidth)
         values = [func(*vertex) for vertex in vertices]
-        case_index = sum(2 ** i for i, v in enumerate(values) if v > isovalue)
+        case_index = sum(2 ** i for i, v in enumerate(values) if v > isovalue)  # TODO: iso isclose
 
         # Process cell if it is neither entirely above nor entirely below the isovalue.
         if case_index != 0 and case_index != full_mask:
@@ -107,7 +108,7 @@ def marching_hypercubes(func, stepwidth, isovalue, start_coord):
                     neighbor_origin = grid_origin + stepwidth * np.array(neighbor_indices)
                     neighbor_vertices = get_hypercube_vertices(dim, neighbor_origin, stepwidth)
                     neighbor_values = [func(*vertex) for vertex in neighbor_vertices]
-                    neighbor_case_index = sum(2 ** i for i, v in enumerate(neighbor_values) if v > isovalue)
+                    neighbor_case_index = sum(2 ** i for i, v in enumerate(neighbor_values) if v > isovalue)  # TODO: iso isclose
 
                     if neighbor_case_index != 0 and neighbor_case_index != full_mask:
                         queue.append(neighbor_indices)

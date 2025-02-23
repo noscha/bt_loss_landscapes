@@ -1,8 +1,9 @@
-import src.marching_hypercubes as mh
 import matplotlib.pyplot as plt
 
-def test_circle():
+import src.marching_hypercubes as mh
 
+
+def test_circle():
     def circle_function(*coords):
         x, y = coords
         return x ** 2 + y ** 2
@@ -24,7 +25,6 @@ def test_circle():
 
 
 def test_sphere():
-
     def sphere_function(*coords):
         x, y, z = coords
         return x ** 2 + y ** 2 + z ** 2
@@ -47,9 +47,11 @@ def test_sphere():
     ax.set_zlabel("Z")
     plt.show()
 
+
 def all_tests():
     test_circle()
     test_sphere()
+
 
 if __name__ == "__main__":
     all_tests()
