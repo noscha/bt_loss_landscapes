@@ -3,14 +3,12 @@ from collections import deque
 from itertools import product
 
 
-def count_interior_from_iso_points(iso_points, step, margin=1, func=None):
+def count_interior_from_iso_points(iso_points, step, margin=1):
     """
     Given an iso point cloud (points on the isosurface) in high dimensions,
     this function creates a grid, marks cells that contain an iso point as surface,
     flood-fills from the boundary to mark exterior cells, and then counts cells
-    that are neither surface nor exterior (i.e. interior). Additionally, if a
-    scalar function 'func' is provided, the function is evaluated at the center
-    of each interior voxel and the sum of these values is computed.
+    that are neither surface nor exterior (i.e. interior)
 
     Parameters:
       iso_points : np.ndarray
@@ -85,17 +83,4 @@ def count_interior_from_iso_points(iso_points, step, margin=1, func=None):
     interior_mask = ~surface_mask & ~exterior_mask
     interior_count = np.sum(interior_mask)
 
-    # Optionally sum up the function values in the interior cells.
-    interior_iso_sum = 0.0
-    if func is not None:
-        # Iterate over all cell indices and, for each interior cell,
-        # evaluate the function at the cell's center.
-        for idx in product(*(range(s) for s in grid_shape)):
-            if interior_mask[idx]:
-                idx_arr = np.array(idx)
-                cell_center = min_bounds + (idx_arr + 0.5) * step
-                interior_iso_sum += func(*cell_center)
-    else:
-        interior_iso_sum = None
-
-    return interior_count, tuple(grid_shape), surface_mask, exterior_mask, interior_iso_sum / interior_count
+    return interior_count, tuple(grid_shape), surface_mask, exterior_mask
