@@ -1,4 +1,3 @@
-import src.helper as h
 import src.network as nw
 
 
@@ -18,7 +17,6 @@ def test_network():
 
 
 def all_tests():
-    h.set_enviroment()
     test_network()
 
 

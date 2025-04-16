@@ -1,78 +1,33 @@
 import math
 
-import network as nw
-import marching_hypercubes as mh
-import filling_hypercubes as fh
-import plot as p
 import numpy as np
 
-def experiment():
+import grid_traversal as gt
+import network as n
+import plot as p
 
+
+def experiment():
     dimensions = [2, 3, 4, 5]
-    steps = np.round(np.linspace(0.05, 0.005, 20), 3)
-    #steps = [0.05, 0.025, 0.005, 0.0025]
+    size_volumes = [3, 4, 5, 6, 7, 8]
+    stepwidths = np.round(np.linspace(0.1, 0.01, num=20), 3)
 
     for dim in dimensions:
 
-        interior_counts = []
+        wrapper = n.ModelWrapper(dim)
+        counts_global = []
 
-        wrapper = nw.ModelWrapper(dim)
+        for stepwidth in stepwidths:
 
-        start_coord = wrapper.get_current_params()
-        isovalue = wrapper.evaluate_loss(start_coord)
-        stepwidth = 0.1
+            counts_local = []
 
-        isosurface = mh.marching_hypercubes(wrapper.func, stepwidth, isovalue, start_coord)
+            for size_volume in size_volumes:
+                data, _ = gt.grid_traversal(wrapper, stepwidth, size_volume)
 
-        for step in steps:
+                count = math.log(len(data))  # todo , STEP???
+                print(size_volume, size_volume, dim, count)
+                counts_local.append(count)
 
-            interior_count, grid_shape, surface_mask, exterior_mask  = fh.count_interior_from_iso_points_hull_first(
-                isosurface, step, margin=2)
+            counts_global.append(counts_local)
 
-            print(dim, step, interior_count)
-            interior_counts.append(math.log(interior_count))
-
-        p.plot_bar_diagram(steps, interior_counts)
-
-
-def three_d_tets():
-
-
-    wrapper = nw.ModelWrapper(3)
-
-    start_coord = wrapper.get_current_params()
-    isovalue = wrapper.evaluate_loss(start_coord)
-    stepwidth = 0.1
-
-    isosurface = mh.marching_hypercubes(wrapper.func, stepwidth, isovalue, start_coord)
-
-    """
-
-    filename = '3d.json'
-    with open(filename, 'w') as file:
-        json.dump(isosurface.tolist(), file)
-
-    filename = '3d.json'
-    with open(filename, 'r') as file:
-        isosurface =  np.array(json.load(file))
-        
-    """
-
-
-    """fig = plt.figure(figsize=(8, 8))
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(isosurface[:, 0], isosurface[:, 1], isosurface[:, 2], s=1, c="blue")
-    ax.set_title("Isosurface for Sphere Function")
-    ax.set_xlabel("X")
-    ax.set_ylabel("Y")
-    ax.set_zlabel("Z")
-    plt.show()"""
-
-    interior_count, _, _, _ = fh.count_interior_from_iso_points_hull_first(
-        isosurface, 0.05, margin=2)
-
-    print(interior_count)
-
-
-if __name__ == "__main__":
-    experiment()
+        p.plot_bar_diagram(size_volumes, counts_global, labels=stepwidths, name=dim)

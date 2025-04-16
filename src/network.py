@@ -1,7 +1,9 @@
+import random
+
+import numpy as np
 import pytorch_lightning as pl
 import torch
 import torch.nn as nn
-import random
 from torch.utils.data import DataLoader, TensorDataset
 
 
@@ -11,7 +13,14 @@ class ModelWrapper:
     """
 
     def __init__(self, dim=2):
-        #random.seed(42)
+
+        seed = 24
+        torch.manual_seed(seed)
+        np.random.seed(seed)
+        random.seed(seed)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+
         self.model = TinyNN(dim)
         self.input_dim = dim  # TODO: might change later on
         self.dataloader = self.create_data(self.input_dim)
@@ -25,13 +34,13 @@ class ModelWrapper:
         y = torch.rand(50, 1)
 
         dataset = TensorDataset(X, y)
-        dataloader = DataLoader(dataset, batch_size=5, shuffle=True)
+        dataloader = DataLoader(dataset, batch_size=50, shuffle=True)
 
         return dataloader
 
     def train(self):
         """Train model"""
-        trainer = pl.Trainer(max_epochs=5, accelerator="cpu", enable_progress_bar=False)
+        trainer = pl.Trainer(max_epochs=100, accelerator="cpu", enable_progress_bar=True)
         trainer.fit(self.model, self.dataloader)
 
     def get_current_params(self):
