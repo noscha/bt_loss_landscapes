@@ -4,17 +4,6 @@ import numpy as np
 
 
 def plot_interior_voxel_centers(interior_mask, step, min_bounds):
-    """
-    Plot the center points of interior voxels in 2D or 3D.
-
-    Parameters:
-      interior_mask : np.ndarray
-          Boolean mask where True indicates an interior voxel.
-      step : float
-          The side length of each voxel.
-      min_bounds : np.ndarray
-          The minimum bounds of the grid, used to compute world coordinates.
-    """
     # Get indices of interior voxels
     interior_indices = np.argwhere(interior_mask)
 
@@ -43,3 +32,14 @@ def plot_interior_voxel_centers(interior_mask, step, min_bounds):
         plt.show()
     else:
         print(f"Plotting is only supported for 2D and 3D. Got dimension: {d}")
+
+
+
+
+def plot_bar_diagram(x, y, xlabel='Category', ylabel='Value', title='Bar Diagram', show_values=True):
+    plt.plot(x, y, marker='o')
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.title('Simple Line Plot')
+    plt.grid(True)
+    plt.show()

@@ -11,7 +11,7 @@ class ModelWrapper:
     """
 
     def __init__(self, dim=2):
-        random.seed(42)
+        #random.seed(42)
         self.model = TinyNN(dim)
         self.input_dim = dim  # TODO: might change later on
         self.dataloader = self.create_data(self.input_dim)

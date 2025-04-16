@@ -4,6 +4,8 @@ from typing import Callable, List, Tuple, Sequence, Optional, Dict
 
 import numpy as np
 
+import matplotlib.pyplot as plt
+
 
 def generate_lookup_table(dim: int) -> Dict[int, List[Tuple[int, int]]]:
     """
@@ -142,6 +144,22 @@ def marching_hypercubes(func: Callable[..., float],
         # Optionally stop if we've processed too many cells.
         if max_cells is not None and len(visited) >= max_cells:
             break
+        if len(visited) % 1000 == 0:
+            print(len(visited))
+
+
+            """fig = plt.figure(figsize=(8, 8))
+            ax = fig.add_subplot(111, projection='3d')
+            isosurface = np.array(isosurface_points)
+            ax.scatter(isosurface[:, 0], isosurface[:, 1], isosurface[:, 2], s=1, c="blue")
+            ax.set_title("Isosurface for Sphere Function")
+            ax.set_xlabel("X")
+            ax.set_ylabel("Y")
+            ax.set_zlabel("Z")
+            name = "images/" + str(len(visited)) + ".png"
+            #plt.savefig(name, dpi=300, bbox_inches='tight', transparent=True)
+            plt.show()"""
+
 
         # Compute the lower corner of the current cell.
         origin = grid_origin + stepwidth * np.array(indices)
@@ -203,4 +221,4 @@ def marching_hypercubes(func: Callable[..., float],
                     if neighbor_case_index != 0 and neighbor_case_index != full_mask:
                         queue.append(neighbor_indices)
 
-    return np.array(isosurface_points)
+    return 0 if len(isosurface_points) == 0 else np.array(isosurface_points)
