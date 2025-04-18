@@ -9,8 +9,8 @@ import plot as p
 
 def experiment():
     dimensions = [2, 3, 4, 5]
-    size_volumes = [3, 4, 5, 6, 7, 8]
     stepwidths = np.round(np.linspace(0.1, 0.01, num=20), 3)
+    size_volumes = [2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     for dim in dimensions:
 
@@ -20,12 +20,13 @@ def experiment():
         for stepwidth in stepwidths:
 
             counts_local = []
+            data, next_start = None, None
 
             for size_volume in size_volumes:
-                data, _ = gt.grid_traversal(wrapper, stepwidth, size_volume)
+                data, _, next_start = gt.grid_traversal(wrapper, stepwidth, size_volume, queue=next_start, visited=data)
 
-                count = math.log(len(data))  # todo , STEP???
-                print(size_volume, size_volume, dim, count)
+                count = round(math.log(len(data)), 3)
+                print(dim, stepwidth, size_volume, count)
                 counts_local.append(count)
 
             counts_global.append(counts_local)

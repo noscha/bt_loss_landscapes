@@ -1,3 +1,5 @@
+import os
+
 import matplotlib.pyplot as plt
 
 
@@ -30,9 +32,10 @@ def plot_bar_diagram(x, y, labels, name):
 
     plt.xlabel('c: multiple of epsilon')
     plt.ylabel('log count of interior voxels')
-    plt.title('Multiple Datasets in One Plot')
+    plt.title(f'Plot for dimension: {name}')
     plt.legend()
     plt.grid(True)
+    os.makedirs("images", exist_ok=True)
     filename = "images/" + str(name) + ".png"
     plt.savefig(filename)
     plt.show()

@@ -58,6 +58,7 @@ class ModelWrapper:
 
     def evaluate_loss(self, new_params):
         """Compute the loss after updating model parameters."""
+        old_params = self.get_current_params()
         self.set_model_params(new_params)
 
         self.model.eval()
@@ -69,6 +70,7 @@ class ModelWrapper:
                 loss = self.model.criterion(outputs, targets)
                 total_loss += loss.item()
 
+        self.set_model_params(old_params)
         return total_loss / len(self.dataloader)
 
     def func(self, *params):
