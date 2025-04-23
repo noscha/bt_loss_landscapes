@@ -8,9 +8,9 @@ import plot as p
 
 
 def experiment():
-    dimensions = [2, 3, 4, 5]
-    stepwidths = np.round(np.linspace(0.1, 0.01, num=20), 3)
-    size_volumes = [2, 3, 4, 5, 6, 7, 8, 9, 10]
+    dimensions = [1] # [2, 3, 4, 5]
+    stepwidths = np.round(np.linspace(0.1, 0.01, num=5), 3) # np.round(np.linspace(0.1, 0.01, num=20), 3)
+    size_volumes = [2, 3, 4, 5] # [2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     for dim in dimensions:
 
@@ -32,3 +32,5 @@ def experiment():
             counts_global.append(counts_local)
 
         p.plot_bar_diagram(size_volumes, counts_global, labels=stepwidths, name=dim)
+
+

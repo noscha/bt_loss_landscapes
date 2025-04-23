@@ -4,7 +4,8 @@ import numpy as np
 import pytorch_lightning as pl
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import Dataset, DataLoader, TensorDataset
+from sklearn.datasets import load_iris
 
 
 class ModelWrapper:
@@ -21,14 +22,24 @@ class ModelWrapper:
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
 
-        self.model = TinyNN(dim)
-        self.input_dim = dim  # TODO: might change later on
-        self.dataloader = self.create_data(self.input_dim)
+        if dim == -1:
+
+            self.model = IrisModel()
+            dataset = IrisDataset()
+            self.dataloader = DataLoader(dataset, batch_size=16, shuffle=True)
+
+        else:
+
+            self.model = TinyNN(dim)
+            self.input_dim = dim  # TODO: might change later on
+            self.dataloader = self.create_data(self.input_dim)
+
         self.num_params = sum(p.numel() for p in self.model.parameters())  # Total number of weights
         self.train()
 
     @staticmethod
     def create_data(dim):
+        # TODO auslagern
         """Create random data"""
         X = torch.rand(50, dim)
         y = torch.rand(50, 1)
@@ -101,6 +112,9 @@ class ModelWrapper:
         return direction_vector
 
 
+##################################################################
+
+
 class TinyNN(pl.LightningModule):
     """
     Small network fot testing of algos
@@ -109,12 +123,48 @@ class TinyNN(pl.LightningModule):
     def __init__(self, dim):
         super().__init__()
         self.model = nn.Sequential(
-            nn.Linear(dim, 1, bias=False)
-            # nn.Linear(1, 2),
-            # nn.ReLU(),
-            # nn.Linear(2, 1)
+            # nn.Linear(dim, 1, bias=False)
+            nn.Linear(dim, 2),
+            nn.ReLU(),
+            nn.Linear(2, 1)
         )
         self.criterion = nn.MSELoss()
+
+    def forward(self, x):
+        return self.model(x)
+
+    def training_step(self, batch, batch_idx):
+        inputs, targets = batch
+        outputs = self(inputs)
+        loss = self.criterion(outputs, targets)
+        return loss
+
+    def configure_optimizers(self):
+        return torch.optim.Adam(self.parameters(), lr=0.01)
+
+#################################################################################
+
+class IrisDataset(Dataset):
+    def __init__(self):
+        iris = load_iris()
+        self.X = torch.tensor(iris.data, dtype=torch.float32)
+        self.y = torch.tensor(iris.target, dtype=torch.long)
+
+    def __len__(self):
+        return len(self.y)
+
+    def __getitem__(self, idx):
+        return self.X[idx], self.y[idx]
+
+class IrisModel(pl.LightningModule):
+    def __init__(self):
+        super().__init__()
+        self.model = nn.Sequential(
+            nn.Linear(4, 8),
+            nn.ReLU(),
+            nn.Linear(8, 3)
+        )
+        self.criterion = nn.CrossEntropyLoss()
 
     def forward(self, x):
         return self.model(x)
