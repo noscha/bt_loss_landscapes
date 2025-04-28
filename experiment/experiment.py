@@ -2,15 +2,15 @@ import math
 
 import numpy as np
 
-import grid_traversal as gt
-import network as n
-import plot as p
+import src.grid_traversal as gt
+import src.network as n
+import src.plot as p
 
 
-def experiment():
-    dimensions = [1] # [2, 3, 4, 5]
-    stepwidths = np.round(np.linspace(0.1, 0.01, num=5), 3) # np.round(np.linspace(0.1, 0.01, num=20), 3)
-    size_volumes = [2, 3, 4, 5] # [2, 3, 4, 5, 6, 7, 8, 9, 10]
+def look_for_modes():
+    dimensions = [1]  # [2, 3, 4, 5]
+    stepwidths = np.round(np.linspace(0.1, 0.01, num=5), 3)  # np.round(np.linspace(0.1, 0.01, num=20), 3)
+    size_volumes = [2, 3, 4, 5]  # [2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     for dim in dimensions:
 
@@ -33,4 +33,6 @@ def experiment():
 
         p.plot_bar_diagram(size_volumes, counts_global, labels=stepwidths, name=dim)
 
+    def bfs_with_dropout():
 
+        pass

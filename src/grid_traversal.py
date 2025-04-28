@@ -3,7 +3,7 @@ import random
 import numpy as np
 
 
-def grid_traversal(model, stepwidth, size_volume, queue=None, visited=None, accuracy=3, limit=10_000_000):
+def grid_traversal(model, stepwidth, size_volume, queue=None, visited=None, accuracy=3, dropout=0, limit=10_000_000):
     iterations = 0
     start_coord = tuple(np.float64(round(i, accuracy)) for i in model.get_current_params())
     c = size_volume * model.evaluate_loss(start_coord)
@@ -16,14 +16,14 @@ def grid_traversal(model, stepwidth, size_volume, queue=None, visited=None, accu
     # bfs
     while queue and iterations < limit:
 
-        element_to_pop = random.randrange(len(queue))
+        element_to_pop = random.randrange(len(queue)) if iterations > 1000 else 0
         curr_coord = queue.pop(element_to_pop)
 
         for coord in neighboring_coords(curr_coord, stepwidth, accuracy):
 
-            if coord in visited or random.random() > 0.5:
+            # no dropout of first 1000 elements for smooth start
+            if coord in visited or (random.random() > dropout and iterations > 1000):
                 pass
-                # what to do if not included
 
             elif model.evaluate_loss(coord) <= c:
                 queue.append(coord)

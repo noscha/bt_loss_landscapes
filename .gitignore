@@ -14,3 +14,4 @@ wheels/
 
 # Torch
 */lightning_logs
+*/ceckpoints

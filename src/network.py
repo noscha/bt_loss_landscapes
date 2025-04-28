@@ -4,8 +4,8 @@ import numpy as np
 import pytorch_lightning as pl
 import torch
 import torch.nn as nn
-from torch.utils.data import Dataset, DataLoader, TensorDataset
 from sklearn.datasets import load_iris
+from torch.utils.data import Dataset, DataLoader, TensorDataset
 
 
 class ModelWrapper:
@@ -142,6 +142,7 @@ class TinyNN(pl.LightningModule):
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=0.01)
 
+
 #################################################################################
 
 class IrisDataset(Dataset):
@@ -155,6 +156,7 @@ class IrisDataset(Dataset):
 
     def __getitem__(self, idx):
         return self.X[idx], self.y[idx]
+
 
 class IrisModel(pl.LightningModule):
     def __init__(self):
