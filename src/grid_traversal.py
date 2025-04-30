@@ -3,13 +3,24 @@ import random
 import numpy as np
 
 
-def grid_traversal(model, stepwidth, size_volume, queue=None, visited=None, accuracy=3, dropout=0, limit=10_000_000):
+# TODO: make class
+
+def grid_traversal(model, stepwidth, size_volume, B=None, queue=None, visited=None, accuracy=3, dropout=0.0,
+                   limit=100_000):
     iterations = 0
-    start_coord = tuple(np.float64(round(i, accuracy)) for i in model.get_current_params())
+    # TODO: type cast !!!!!!!!!!!!!!!!!
+    start_coord = tuple(np.float64(round(i, accuracy)) for i in model.get_current_params())  # theta_star
+    relative_grid_position = tuple(np.zeros(len(start_coord)))  # a
     c = size_volume * model.evaluate_loss(start_coord)
 
+    # TODO: wip
+    #####################################
+    if B is not None:
+        relative_grid_position = tuple(np.ones(2))
+    ######################
+
     if queue is None and visited is None:
-        queue, visited = [start_coord], {start_coord}
+        queue, visited = [relative_grid_position], {relative_grid_position}
 
     future_queue = []
 
@@ -17,21 +28,21 @@ def grid_traversal(model, stepwidth, size_volume, queue=None, visited=None, accu
     while queue and iterations < limit:
 
         element_to_pop = random.randrange(len(queue)) if iterations > 1000 else 0
-        curr_coord = queue.pop(element_to_pop)
+        curr_rel_coord = queue.pop(element_to_pop)
 
-        for coord in neighboring_coords(curr_coord, stepwidth, accuracy):
+        for rel_coord in neighboring_coords(curr_rel_coord, accuracy):
 
             # no dropout of first 1000 elements for smooth start
-            if coord in visited or (random.random() > dropout and iterations > 1000):
+            if rel_coord in visited or (random.random() < dropout and iterations > 1000):
                 pass
 
-            elif model.evaluate_loss(coord) <= c:
-                queue.append(coord)
-                visited.add(coord)
+            elif model.evaluate_loss(relative_to_true(rel_coord, B, start_coord, stepwidth, accuracy)) <= c:
+                queue.append(rel_coord)
+                visited.add(rel_coord)
 
             else:
-                future_queue.append(coord)
-                visited.add(coord)
+                future_queue.append(rel_coord)
+                visited.add(rel_coord)
 
         iterations += 1
 
@@ -41,14 +52,54 @@ def grid_traversal(model, stepwidth, size_volume, queue=None, visited=None, accu
     return visited, start_coord, future_queue
 
 
-def neighboring_coords(coord, stepwidth, accuracy):
-    coord = np.array(coord)
+def neighboring_coords(coord, accuracy):
     dim = len(coord)
+    neighbors = []
 
-    offsets = np.array([-stepwidth, stepwidth])
-    all_offsets = np.array([np.array([o if i == j else 0 for i in range(dim)]) for j in range(dim) for o in offsets])
-    all_offsets = all_offsets.reshape(2 * dim, dim)
-
-    neighbors = [tuple(np.round(coord + offset, decimals=accuracy)) for offset in all_offsets]
+    for i in range(dim):
+        for delta in [-1, 1]:
+            neighbor = list(coord)
+            neighbor[i] = round(neighbor[i] + delta, accuracy)
+            neighbors.append(tuple(neighbor))
 
     return neighbors
+
+
+def relative_to_true(relative_coord, B, start_coord, stepwidth, accuracy):
+    relative_coord = np.asarray(relative_coord)
+
+    # TODO wip
+    #################################
+    if B is not None:
+        coord = B @ relative_coord
+
+        relative_coord = coord
+    ###################################
+
+    start_coord = np.asarray(start_coord)
+
+    # theta = theta_star + B(a) * s
+    new_coord = start_coord + relative_coord * stepwidth
+
+    return new_coord
+
+
+def subspace(model, subspace_dim=3):
+    vectors = []
+    basis = []
+
+    for i in range(subspace_dim + 1):
+        model.train()
+        vectors.append(np.asarray(model.get_current_params()))
+
+    for i in range(1, subspace_dim + 1):
+        basis.append(vectors[0] - vectors[i])
+
+    basis = np.column_stack(basis)
+
+    if np.linalg.matrix_rank(basis) != subspace_dim:
+        print("Linear dependence")
+        return -1
+
+    Q, R = np.linalg.qr(basis, mode='reduced')
+    return Q

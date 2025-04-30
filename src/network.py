@@ -51,6 +51,7 @@ class ModelWrapper:
 
     def train(self):
         """Train model"""
+        self.initialize_weights()
         trainer = pl.Trainer(max_epochs=100, accelerator="cpu", enable_progress_bar=True)
         trainer.fit(self.model, self.dataloader)
 
@@ -111,6 +112,12 @@ class ModelWrapper:
         # direction_vector /= np.linalg.norm(direction_vector)
         return direction_vector
 
+    def initialize_weights(self):
+
+        for m in self.model.model:  # TODO rename
+            if isinstance(m, nn.Linear):
+                nn.init.xavier_uniform_(m.weight)
+
 
 ##################################################################
 
@@ -123,10 +130,11 @@ class TinyNN(pl.LightningModule):
     def __init__(self, dim):
         super().__init__()
         self.model = nn.Sequential(
-            # nn.Linear(dim, 1, bias=False)
-            nn.Linear(dim, 2),
-            nn.ReLU(),
-            nn.Linear(2, 1)
+            nn.Linear(dim, 1, bias=False)
+
+            # nn.Linear(dim, 2),
+            # nn.ReLU(),
+            # nn.Linear(2, 1)
         )
         self.criterion = nn.MSELoss()
 
