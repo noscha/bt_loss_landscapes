@@ -6,7 +6,7 @@ import numpy as np
 # TODO: make class
 
 def grid_traversal(model, stepwidth, size_volume, B=None, queue=None, visited=None, accuracy=3, dropout=0.0,
-                   limit=1_000_000):
+                   limit=10_000_000):
     iterations = 0
     # TODO: type cast !!!!!!!!!!!!!!!!!
     start_coord = tuple(np.float64(round(i, accuracy)) for i in model.get_current_params())  # theta_star
@@ -16,7 +16,7 @@ def grid_traversal(model, stepwidth, size_volume, B=None, queue=None, visited=No
     # TODO: wip
     #####################################
     if B is not None:
-        relative_grid_position = tuple(np.zeros(2))
+        relative_grid_position = tuple(np.zeros(3))
     ######################
 
     if queue is None and visited is None:

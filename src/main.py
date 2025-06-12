@@ -5,10 +5,12 @@ import grid_traversal as gt
 import matplotlib
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import experiment.experiment as e
 
 if __name__ == "__main__":
 
-    wrappper = n.ModelWrapper(3)
+    e.look_for_modes()
+    """wrappper = n.ModelWrapper(3)
     o = np.asarray(wrappper.get_current_params())
     b = gt.subspace(wrappper, subspace_dim=2)
     visited, o, _ = gt.grid_traversal(wrappper, 0.1, 3, B=b)
@@ -56,7 +58,7 @@ if __name__ == "__main__":
     ax.legend()
     plt.title('3D Plane with Data Points')
     plt.tight_layout()
-    plt.show()
+    plt.show()"""
 
     """wrappper = n.ModelWrapper(-1)
     b = gt.subspace(wrappper)

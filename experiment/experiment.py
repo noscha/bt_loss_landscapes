@@ -9,13 +9,13 @@ import src.plot as p
 
 def look_for_modes():
     dimensions = [-1]  # [2, 3, 4, 5]
-    stepwidths = np.round(np.linspace(0.1, 0.01, num=20), 3)  # np.round(np.linspace(0.1, 0.01, num=20), 3)
-    size_volumes = [1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8]  # [2, 3, 4, 5, 6, 7, 8, 9, 10]
+    stepwidths = np.round(np.linspace(0.1, 0.01, num=10), 3)  # np.round(np.linspace(0.1, 0.01, num=20), 3)
+    size_volumes = [1.1, 1.2, 1.3, 1.4]  # [2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     for dim in dimensions:
 
         wrapper = n.ModelWrapper(dim)
-        b = gt.subspace(wrapper, subspace_dim=2)
+        b = gt.subspace(wrapper, subspace_dim=3)
         counts_global = []
 
         for stepwidth in stepwidths:
@@ -28,7 +28,7 @@ def look_for_modes():
                                                         queue=next_start, visited=data)
 
                 count = round(math.log(len(data)), 3)
-                print(dim, stepwidth, size_volume, count, len(data))
+                print(dim, stepwidth, size_volume, count)
                 counts_local.append(count)
 
             counts_global.append(counts_local)
@@ -121,7 +121,7 @@ def different_basis():
                                                         queue=next_start, visited=data)
 
                 count = round(math.log(len(data)), 3)
-                print(base, stepwidth, size_volume, count)
+                print(base, stepwidth, size_volume)
                 counts_local.append(count)
 
             counts_global.append(counts_local)
