@@ -32,7 +32,7 @@ def plot_bar_diagram(x, y, labels, name):
 
     plt.xlabel('c: multiple of epsilon')
     plt.ylabel('log count of interior voxels')
-    plt.title(f'Plot for dimension: {name}')
+    plt.title(f'Plot for Iris')
     plt.legend()
     plt.grid(True)
     os.makedirs("images", exist_ok=True)

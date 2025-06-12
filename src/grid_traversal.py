@@ -6,7 +6,7 @@ import numpy as np
 # TODO: make class
 
 def grid_traversal(model, stepwidth, size_volume, B=None, queue=None, visited=None, accuracy=3, dropout=0.0,
-                   limit=100_000):
+                   limit=1_000_000):
     iterations = 0
     # TODO: type cast !!!!!!!!!!!!!!!!!
     start_coord = tuple(np.float64(round(i, accuracy)) for i in model.get_current_params())  # theta_star
@@ -16,7 +16,7 @@ def grid_traversal(model, stepwidth, size_volume, B=None, queue=None, visited=No
     # TODO: wip
     #####################################
     if B is not None:
-        relative_grid_position = tuple(np.ones(2))
+        relative_grid_position = tuple(np.zeros(2))
     ######################
 
     if queue is None and visited is None:
@@ -64,11 +64,9 @@ def neighboring_coords(coord, accuracy):
 
     return neighbors
 
-
 def relative_to_true(relative_coord, B, start_coord, stepwidth, accuracy):
     relative_coord = np.asarray(relative_coord)
 
-    # TODO wip
     #################################
     if B is not None:
         coord = B @ relative_coord
@@ -84,7 +82,7 @@ def relative_to_true(relative_coord, B, start_coord, stepwidth, accuracy):
     return new_coord
 
 
-def subspace(model, subspace_dim=3):
+def subspace(model, subspace_dim=3, orthogonal=True):
     vectors = []
     basis = []
 
@@ -101,5 +99,8 @@ def subspace(model, subspace_dim=3):
         print("Linear dependence")
         return -1
 
-    Q, R = np.linalg.qr(basis, mode='reduced')
-    return Q
+    if orthogonal:
+        Q, R = np.linalg.qr(basis, mode='reduced')
+        return Q
+
+    return basis
